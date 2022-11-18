@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.webui.daoUi.WebUiSceneDao">
+    <insert id="addScene" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+		INSERT INTO
+		uiscene(sceneName,caseIds,status,addTime)
+		VALUES(#{sceneName},#{caseIds},#{status},now())
+	</insert>
+    <select id="scenes"
+            resultType="com.thinkingdata.webui.entityUi.WebUiScene"
+            parameterType="hashmap">
+        select * from uicase where 1=1
+        <if test="id != null and id !='' ">
+            and id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="sceneName != null and sceneName != '' ">
+            and sceneName LIKE CONCAT('%',#{sceneName},'%' )
+        </if>
+        <if test="addStartTime != null  and addStartTime != '' ">
+            and addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null  and addEndTime != '' ">
+            and addTime &lt;=#{addEndTime}
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upEndTime != null and upEndTime != '' ">
+            and updateTime &lt;=#{upEndTime}
+        </if>
+        <if test="status != null">
+            and status=#{status}
+        </if>
+        order by updateTime desc limit
+        #{limit1,jdbcType=INTEGER},#{limit2,jdbcType=INTEGER}
+    </select>
+    <select id="allScene"
+            resultType="com.thinkingdata.webui.entityUi.WebUiScene">
+        select * from uicase
+    </select>
+    <select id="total" resultType="java.lang.Integer"
+            parameterType="hashmap">
+        select count(*) from uiscene where 1=1
+        <if test="id != null and id !='' ">
+            and id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="sceneName != null and sceneName != '' ">
+            and sceneName LIKE CONCAT('%',#{sceneName},'%' )
+        </if>
+        <if test="addStartTime != null  and addStartTime != '' ">
+            and addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null  and addEndTime != '' ">
+            and addTime &lt;=#{addEndTime}
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upEndTime != null and upEndTime != '' ">
+            and updateTime &lt;=#{upEndTime}
+        </if>
+        <if test="status != null">
+            and status=#{status}
+        </if>
+    </select>
+    <update id="updateScene"
+            parameterType="com.thinkingdata.webui.entityUi.WebUiScene">
+        update uiscene
+        <set>
+            <if test="sceneName != null and sceneName != '' ">
+                sceneName = #{sceneName},
+            </if>
+            <if test="caseIds != null and caseIds != '' ">
+                caseIds = #{caseIds},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            updateTime=now()
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <select id="getSceneById"
+            resultType="com.thinkingdata.webui.entityUi.WebUiScene">
+		select * from uiscene where id=#{sceneId}
+	</select>
+</mapper>

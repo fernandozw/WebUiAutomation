@@ -1,0 +1,17 @@
+condition:
+  locationList: [{"label":"id","value":"id"},{"label":"name","value":"name"},{"label":"className","value":"className"},{"label":"cssSelector","value":"cssSelector"},{"label":"linkText","value":"linkText"},{"label":"partialLinkText","value":"partialLinkText"},{"label":"tagName","value":"tagName"},{"label":"xpath","value":"xpath"}]
+  actionList: [{'label': '清除','value': 'clear'},{'label': '点击','value': 'click'},{'label': '输入','value': 'sendKeys'},{'label': '提交','value': 'submit'},{'label': '鼠标悬停','value': 'mouseOver'}]
+  statusMap: {'1':'启用','2':'禁用'}
+  statusList: [{'label':'启用','value':1},{'label':'禁用','value':2}]
+  actionParamMap: {'submit':  false,'clear':false,'mouseOver':false,'sendKeys':true,'click':false}
+  verifyMap: {'assertChecked':false,'assertSelected':false,'assertElementNotPresent':true,'assertEnabled':false,'assertNotChecked':false,'assertContains':true,'assertTitle':true,'assertText':true,'assertDisplay':false,'assertLocation':true,'assertValue':true,'assertElementPresent':true,'assertNotSelected':false}
+  verifyList: [{'label':'文本内容','value':'assertText'},{'label':'包含','value':'assertContains'},{'label':'可见','value':'assertDisplay'},{'label':'可用','value':'assertEnabled'},{'label':'未选中','value':'assertNotSelected'},{'label':'选中','value':'assertSelected'},{'label':'未勾选','value':'assertNotChecked'},{'label':'勾选','value':'assertChecked'},{'label':'元素未出现','value':'assertElementNotPresent'},{'label':'元素出现','value':'assertElementPresent'},{'label':'元素值','value':'assertValue'},{'label':'标题','value':'assertTitle'},{'label':'url地址','value':'assertLocation'},{'label':'完整图或局部图','value':'assertCompleteOrPartialImage'},{'label':'完整图片','value':'assertCompleteImage'},{'label':'局部图片','value':'assertPartialImage'}]
+  canUseMap: {'1':'启用','2':'停用'}
+  canUseList: [{'label':'启用','value':1},{'label':'停用','value':2}]
+  caseStatusMap: {'1':'空闲','2':'运行中'}
+  caseStatusList: [{'label':'运行中','value':2},{'label':'空闲','value':1}]
+  pageTypeList: [{'label':'pc_web','value':'pc_web'},{'label':'h5','value':'h5'}]
+  phoneTypeList: [{'label':'iPhone SE','value':'iPhone SE'},{'label':'iPhone 12 Pro','value':'iPhone 12 Pro'},{'label':'iPad Air','value':'iPad Air'},{'label':'Galaxy S9+','value':'Galaxy S9+'},{'label':'BlackBerry Z30','value':'BlackBerry Z30'},{'label':'Suface Pro 7','value':'Suface Pro 7'}]
+  pageVerifyList: [{'label':'url地址','value':'assertLocation'},{'label':'标题','value':'assertTitle'}]
+  browserTypeList: [{'label':'chrome','value':'chrome'},{'label':'fireFox','value':'fireFox'}]
+  needValueVerifyList: ['assertText', 'assertContains', 'assertValue', 'assertElementPresent', 'assertElementNotPresent', 'assertTitle', 'assertLocation']

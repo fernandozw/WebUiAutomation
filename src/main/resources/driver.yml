@@ -1,0 +1,5 @@
+driver:
+   chrome:
+      node: "http://127.0.0.1:5555/wd/hub"
+   fireFox:
+      node: "http://127.0.0.1:5555/wd/hub"

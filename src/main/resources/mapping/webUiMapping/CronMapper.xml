@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.webui.daoUi.CronDao">
+    <insert id="addCron" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+		INSERT INTO
+		cron(cronName,status,execTime,args,addTime)
+		VALUES(#{cronName},#{status},#{execTime},#{args},now())
+	</insert>
+    <select id="list"
+            resultType="com.thinkingdata.webui.entityUi.Cron"
+            parameterType="hashmap">
+        select * from cron where 1=1
+        <if test="id != null and id !='' ">
+            and id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="cronName != null and cronName != '' ">
+            and cronName LIKE CONCAT('%',#{cronName},'%' )
+        </if>
+        <if test="status != null">
+            and status=#{status}
+        </if>
+        <if test="addStartTime != null  and addStartTime != '' ">
+            and addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null  and addEndTime != '' ">
+            and addTime &lt;=#{addEndTime}
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upEndTime != null and upEndTime != '' ">
+            and updateTime &lt;=#{upEndTime}
+        </if>
+        order by updateTime desc limit
+        #{limit1,jdbcType=INTEGER},#{limit2,jdbcType=INTEGER}
+    </select>
+    <select id="total" resultType="java.lang.Integer"
+            parameterType="hashmap">
+        select count(*) from cron where 1=1
+        <if test="id != null and id !='' ">
+            and id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="cronName != null and cronName != '' ">
+            and cronName LIKE CONCAT('%',#{cronName},'%' )
+        </if>
+        <if test="status != null">
+            and status=#{status}
+        </if>
+        <if test="addStartTime != null  and addStartTime != '' ">
+            and addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null  and addEndTime != '' ">
+            and addTime &lt;=#{addEndTime}
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upEndTime != null and upEndTime != '' ">
+            and updateTime &lt;=#{upEndTime}
+        </if>
+    </select>
+    <update id="update"
+            parameterType="com.thinkingdata.webui.entityUi.Cron">
+        update cron
+        <set>
+            <if test="cronName != null and cronName != '' ">
+                cronName = #{cronName},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="execTime != null and execTime != '' ">
+                execTime = #{execTime},
+            </if>
+            <if test="args != null and args != '' ">
+                args = #{args},
+            </if>
+            updateTime=now()
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <select id="getCronById"
+            resultType="com.thinkingdata.webui.entityUi.Cron">
+		select * from cron where id=#{cronId}
+	</select>
+    <delete id="removeById">
+        delete from cron where id=#{cronId}
+    </delete>
+    <select id="allCron" resultType="com.thinkingdata.webui.entityUi.Cron">
+        select * from cron
+    </select>
+</mapper>

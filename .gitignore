@@ -1,0 +1,5 @@
+/target/
+/log/
+/.idea/
+/qa_backend.iml
+/.DS_Store

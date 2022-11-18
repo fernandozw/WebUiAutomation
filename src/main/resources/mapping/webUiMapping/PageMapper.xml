@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.webui.daoUi.WebUiPageDao">
+    <insert id="addPage" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+		INSERT INTO
+		page(pageName,addTime,updateTime)
+		VALUES(#{pageName},now(),now())
+	</insert>
+    <select id="pages"
+            resultType="com.thinkingdata.webui.entityUi.WebUiPage"
+            parameterType="hashmap">
+        select * from page where 1=1
+        <if test="id != null and id !='' ">
+            and id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="pageName != null and pageName != '' ">
+            and pageName LIKE CONCAT('%',#{pageName},'%' )
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upEndTime != null and upEndTime != '' ">
+            and updateTime &lt;=#{upEndTime}
+        </if>
+        <if test="addStartTime != null and addStartTime != '' ">
+            and addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null and addEndTime != '' ">
+            and addTime &lt;=#{addEndTime}
+        </if>
+        order by updateTime desc limit
+        #{limit1,jdbcType=INTEGER},#{limit2,jdbcType=INTEGER}
+    </select>
+    <select id="total" resultType="java.lang.Integer"
+            parameterType="map">
+        select count(*) from page where 1=1
+        <if test="id != null and id != '' ">
+            and id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="pageName != null and pageName != '' ">
+            and pageName LIKE CONCAT('%',#{pageName},'%' )
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upEndTime != null and upEndTime != '' ">
+            and updateTime &lt;=#{upEndTime}
+        </if>
+        <if test="addStartTime != null and addStartTime != '' ">
+            and addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null and addEndTime != '' ">
+            and addTime &lt;=#{addEndTime}
+        </if>
+    </select>
+    <select id="allPage"
+            resultType="com.thinkingdata.webui.entityUi.WebUiPage">
+        select * from page
+    </select>
+
+    <!--根据页面id获取页面-->
+    <select id="getPageById"
+            resultType="com.thinkingdata.webui.entityUi.WebUiPage"
+            parameterType="java.lang.Integer">
+	select * from page where id=#{id,jdbcType=INTEGER}
+	</select>
+
+    <update id="updatePage"
+            parameterType="com.thinkingdata.webui.entityUi.WebUiPage">
+        update page
+        <set>
+            <if test="pageName != null and pageName != '' ">
+                pageName = #{pageName},
+            </if>
+            updateTime=now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--根据页面id删除页面-->
+    <delete id="deletePageById">
+        DELETE from page WHERE id=#{id}
+    </delete>
+    <!--检查页面是否存在-->
+    <select id="checkPage" resultType="Integer">
+        select count(*) from page
+        where pageName =#{pageName}
+        <if test="id!=null and id!=''">
+            and id!=#{id}
+        </if>
+    </select>
+
+    <!--检查页面下是否存在元素-->
+    <select id="checkDelete" resultType="Integer">
+        select count(*) from element
+        where pageId =#{id}
+    </select>
+</mapper>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.webui.daoUi.WebUiElementDao">
+    <insert id="addElement" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+		INSERT INTO
+		element(elementName,iframe,locateType,keyword,pageId,addTime,updateTime)
+		VALUES(#{elementName},#{iframe},#{locateType},#{keyword},#{pageId,jdbcType=INTEGER},now(),now())
+	</insert>
+    <select id="elements"
+            resultType="Map"
+            parameterType="hashmap">
+        select e.id,e.elementName,e.iframe,e.locateType,e.keyword,e.pageId,e.addTime,e.updateTime,p.pageName from element e left join page p on e.pageId=p.id where 1=1
+        <if test="id != null and id !='' ">
+            and e.id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="elementName != null and elementName != '' ">
+            and e.elementName LIKE CONCAT('%',#{elementName},'%' )
+        </if>
+        <if test="iframe != null and iframe != '' ">
+            and e.iframe LIKE CONCAT('%',#{iframe},'%' )
+        </if>
+        <if test="locateType != null and locateType != '' ">
+            and e.locateType LIKE CONCAT('%',#{locateType},'%' )
+        </if>
+        <if test="keyword != null and keyword != '' ">
+            and e.keyword LIKE CONCAT('%',#{keyword},'%' )
+        </if>
+        <if test="pageId != null and pageId != '' ">
+            and e.pageId=#{pageId,jdbcType=INTEGER}
+        </if>
+        <if test="addStartTime != null  and addStartTime != '' ">
+            and e.addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null  and addEndTime != '' ">
+            and e.addTime &lt;=#{addEndTime}
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and e.updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and e.updateTime &lt;=#{upEndTime}
+        </if>
+        order by e.updateTime desc limit
+        #{limit1,jdbcType=INTEGER},#{limit2,jdbcType=INTEGER}
+    </select>
+    <select id="total" resultType="java.lang.Integer"
+            parameterType="hashmap">
+        select count(*) from element e left join page p on e.pageId=p.id where 1=1
+        <if test="id != null and id !='' ">
+            and e.id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="elementName != null and elementName != '' ">
+            and e.elementName LIKE CONCAT('%',#{elementName},'%' )
+        </if>
+        <if test="iframe != null and iframe != '' ">
+            and e.iframe LIKE CONCAT('%',#{iframe},'%' )
+        </if>
+        <if test="locateType != null and locateType != '' ">
+            and e.locateType LIKE CONCAT('%',#{locateType},'%' )
+        </if>
+        <if test="keyword != null and keyword != '' ">
+            and e.keyword LIKE CONCAT('%',#{keyword},'%' )
+        </if>
+        <if test="pageId != null and pageId != '' ">
+            and e.pageId=#{pageId,jdbcType=INTEGER}
+        </if>
+        <if test="addStartTime != null  and addStartTime != '' ">
+            and e.addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null  and addEndTime != '' ">
+            and e.addTime &lt;=#{addEndTime}
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and e.updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and e.updateTime &lt;=#{upEndTime}
+        </if>
+    </select>
+    <update id="updateElement"
+            parameterType="com.thinkingdata.webui.entityUi.WebUiElement">
+        update element
+        <set>
+            <if test="elementName != null and elementName != '' ">
+                elementName = #{elementName},
+            </if>
+            <if test="locateType != null and locateType != '' ">
+                locateType = #{locateType},
+            </if>
+            <if test="keyword != null and keyword != '' ">
+                keyword = #{keyword},
+            </if>
+            <if test="pageId != null and pageId != '' ">
+                pageId = #{pageId,jdbcType=INTEGER},
+            </if>
+            iframe=#{iframe},updateTime=now()
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <select id="getUiElementById" resultType="com.thinkingdata.webui.entityUi.WebUiElement"
+            parameterType="java.lang.Integer">
+        select * from element where id= #{elementId,jdbcType=INTEGER}
+    </select>
+    <select id="getUiElementByPageId" resultType="com.thinkingdata.webui.entityUi.WebUiElement"
+            parameterType="java.lang.Integer">
+        select * from element where pageId= #{pageId,jdbcType=INTEGER}
+    </select>
+    <!--根据id删除元素-->
+    <delete id="deleteById">
+        DELETE from element WHERE id=#{id}
+    </delete>
+    <!--根据业务id删除元素-->
+    <delete id="deleteElementByPageId">
+        DELETE from element WHERE pageId=#{pageId}
+    </delete>
+    <!--获取全部元素-->
+    <select id="getAllElement"
+            resultType="com.thinkingdata.webui.entityUi.WebUiElement"
+    >
+	select * from element
+	</select>
+    <!--检查元素下是否存在步骤-->
+    <select id="checkDelete" resultType="Integer">
+        select count(*) from step
+        where elementId =#{id}
+    </select>
+</mapper>

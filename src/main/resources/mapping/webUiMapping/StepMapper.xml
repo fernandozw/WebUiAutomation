@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.webui.daoUi.WebUiStepDao">
+    <insert id="addStep" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+		INSERT INTO
+		step(stepName,elementId,action,actionValue,function,status,verifyAction,verifyValue,paramKey,addTime,updateTime)
+		VALUES(#{stepName},#{elementId,jdbcType=INTEGER},#{action},#{actionValue},#{function},#{status},#{verifyAction},#{verifyValue},#{paramKey},now(),now())
+	</insert>
+    <!--批量插入步骤-->
+    <insert id="batchInsertStep" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="java.util.List">
+        insert into step
+        (stepName,elementId,action,actionValue,function,status,verifyAction,verifyValue,paramKey,addTime,updateTime)
+        values
+        <foreach collection="stepList" item="webUiStep" separator=",">
+            (
+            #{webUiStep.stepName},#{webUiStep.elementId,jdbcType=INTEGER},#{webUiStep.action},#{webUiStep.actionValue},#{webUiStep.function},#{webUiStep.status},#{webUiStep.verifyAction},#{webUiStep.verifyValue},#{webUiStep.paramKey},now(),now())
+        </foreach>
+    </insert>
+
+
+    <select id="steps"
+            resultType="Map"
+            parameterType="map">
+        SELECT e.elementName,s.* FROM webui.step s left join webui.element e on s.elementId=e.id where 1=1
+        <if test="status != null and status != ''">
+            and s.status=#{status,jdbcType=INTEGER}
+        </if>
+        <if test="elementId != null and elementId != ''">
+            and s.elementId=#{elementId,jdbcType=INTEGER}
+        </if>
+        <if test="stepName != null and stepName != ''">
+            and s.stepName=#{stepName,jdbcType=VARCHAR}
+        </if>
+        <if test="ids != null and ids != ''">
+            and s.id in
+            <foreach collection="ids.split(',')" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and s.updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upEndTime != null and upEndTime != '' ">
+            and s.updateTime &lt;=#{upEndTime}
+        </if>
+        <if test="addStartTime != null and addStartTime != '' ">
+            and s.addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null and addEndTime != '' ">
+            and s.addTime &lt;=#{addEndTime}
+        </if>
+        order by updateTime desc limit
+        #{limit1,jdbcType=INTEGER},#{limit2,jdbcType=INTEGER}
+    </select>
+    <select id="total" resultType="java.lang.Integer"
+            parameterType="map">
+        select count(*) from step where 1=1
+        <if test="status != null and status != ''">
+            and status=#{status,jdbcType=INTEGER}
+        </if>
+        <if test="elementId != null and elementId != ''">
+            and elementId=#{elementId,jdbcType=INTEGER}
+        </if>
+        <if test="stepName != null and stepName != ''">
+            and stepName=#{stepName,jdbcType=VARCHAR}
+        </if>
+        <if test="ids != null and ids != ''">
+            and id in
+            <foreach collection="ids.split(',')" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upEndTime != null and upEndTime != '' ">
+            and updateTime &lt;=#{upEndTime}
+        </if>
+        <if test="addStartTime != null and addStartTime != '' ">
+            and addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null and addEndTime != '' ">
+            and addTime &lt;=#{addEndTime}
+        </if>
+    </select>
+    <update id="updateStep"
+            parameterType="com.thinkingdata.webui.entityUi.WebUiStep">
+        update step
+        <set>
+            <if test="stepName != null and stepName != '' ">
+                stepName = #{stepName},
+            </if>
+            <if test="elementId != null and elementId != '' ">
+                elementId = #{elementId,jdbcType=INTEGER},
+            </if>
+            <if test="action != null and action != '' ">
+                action = #{action},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            actionValue = #{actionValue},function =
+            #{function},verifyAction=#{verifyAction},paramKey=#{paramKey},verifyValue=#{verifyValue},updateTime=now()
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--批量更新步骤信息-->
+    <update id="batchUpdateStep" parameterType="java.util.List">
+        <foreach collection="stepList" item="stepEntity" index="index" open="" close="" separator=";">
+            UPDATE step
+            <set>
+                <if test="stepEntity.stepName != null and stepEntity.stepName != ''">
+                    stepName = #{stepEntity.stepName},
+                </if>
+                <if test="stepEntity.action != null and stepEntity.action != ''">
+                    action = #{stepEntity.action},
+                </if>
+                <if test="stepEntity.status != null and stepEntity.status != ''">
+                    status = #{stepEntity.status},
+                </if>
+                <if test="stepEntity.elementId != null and stepEntity.elementId != ''">
+                    elementId = #{stepEntity.elementId},
+                </if>
+                actionValue = #{stepEntity.actionValue},function = #{stepEntity.function},verifyAction =
+                #{stepEntity.verifyAction},verifyValue = #{stepEntity.verifyValue},paramKey = #{stepEntity.paramKey},updateTime=now()
+            </set>
+            <where>
+                id = #{stepEntity.id}
+            </where>
+        </foreach>
+    </update>
+    <select id="getUiStepById"
+            resultType="com.thinkingdata.webui.entityUi.WebUiStep"
+            parameterType="java.lang.Integer">
+	select * from step where id = #{id,jdbcType=INTEGER}
+	</select>
+    <!--根据步骤id获取步骤及页面-->
+    <select id="getStepDetailById"
+            resultType="java.util.HashMap"
+            parameterType="java.lang.Integer">
+            SELECT e.pageId,s.id,s.stepName,s.elementId,s.action,s.actionValue,s.function,s.status,s.verifyAction,s.verifyValue,s.paramKey
+            FROM webui.step s left join webui.element e on s.elementId=e.id where s.id=#{id,jdbcType=INTEGER};
+ </select>
+    <!--根据步骤id集获取步骤及页面列表-->
+    <select id="getStepListBySql"
+            resultType="java.util.HashMap"
+            parameterType="java.lang.String">
+      ${sql}
+ </select>
+    <!--根据页面id获取步骤-->
+    <select id="getStepListByPageId"
+            resultType="com.thinkingdata.webui.entityUi.WebUiStep"
+            parameterType="java.lang.Integer">
+	select * from step where elementId in (select id from element where pageId=#{pageId,jdbcType=INTEGER})
+	</select>
+    <!--获取全部步骤-->
+    <select id="getAllStep"
+            resultType="com.thinkingdata.webui.entityUi.WebUiStep"
+    >
+	select * from step
+	</select>
+    <!--根据步骤id删除步骤-->
+    <delete id="deleteStepById">
+        DELETE from step WHERE id=#{id}
+    </delete>
+
+    <!--根据元素id删除步骤-->
+    <delete id="deleteStepByElementId">
+        DELETE from step WHERE elementId=#{elementId}
+    </delete>
+
+    <!--根据页面id删除步骤-->
+    <delete id="deleteStepByPageId">
+delete FROM step where elementId in
+(select * from (select e.id from element e inner join page p on e.pageId=p.id where p.id=#{pageId}) elementIds)
+    </delete>
+
+    <!--获取用例所有的步骤-->
+    <select id="allStepId"
+            resultType="String"
+    >
+	select stepIds from uicase
+	</select>
+</mapper>

@@ -1,0 +1,69 @@
+server:
+  port: 9998
+  servlet:
+    context-path: /webui
+
+spring:
+  datasource:
+    webui:
+      jdbc-url: jdbc:mysql://47.100.78.246:3306/webui?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+      username: root
+      password: it789123
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+    interface:
+      jdbc-url: jdbc:mysql://47.100.78.246:3306/interface?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+      username: root
+      password: it789123
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+  redis:
+    lettuce:
+      pool:
+        MaxTotal: 50
+        minIdle: 1
+        maxWaitMillis: 5000
+        maxIdle: 5
+        testOnBorrow: true
+        testOnReturn: true
+        testWhileIdle: true
+    redis0:
+      database: 0
+      hostName: 47.100.78.246
+      password:
+      port: 6379
+      timeout: 5000
+    redis1:
+      database: 1
+      hostName: 47.100.78.246
+      password:
+      port: 6379
+      timeout: 5000
+
+corsFilter:
+  allowOrigins: http://47.100.78.246:8080,http://127.0.0.1:8080,http://47.100.78.246,http://qa.thinkingdata.com,http://localhost:8080
+  allowedMethods: POST,GET,PUT,OPTIONS,DELETE
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+logging:
+  config: classpath:logback-spring.xml
+  path: log
+  level:
+    root: info
+    com.thinkingdata.webui.daoUi: DEBUG
+compareConfig:
+  completeUrl: http://127.0.0.1:5000/interface/comparePicture/compareComplete
+  partUrl: http://127.0.0.1:5000/interface/comparePicture/comparePart
+  mixUrl: http://127.0.0.1:5000/interface/comparePicture/compareMix
+  compareImageList: assertCompleteOrPartialImage,assertCompleteImage,assertPartialImage
+driverConfig:
+  waitElement: ["waitForElementPresent","waitForElementToBeSelected","waitForElementVisible","waitForElementVisible","waitElementToBeClick","waitElementTextTobePresent","waitElementValueTobePresent"]

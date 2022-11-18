@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.webui.daoUi.WebUiCaseDao">
+    <insert id="addCase" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+		INSERT INTO
+		uicase(caseName,url,pageId,pageType,phoneType,browserType,stepIds,status,verifyAction,verifyValue,addTime,updateTime)
+		VALUES(#{caseName},#{url},#{pageId},#{pageType},#{phoneType},#{browserType},#{stepIds},#{status,jdbcType=INTEGER},#{verifyAction},#{verifyValue},now(),now())
+	</insert>
+    <select id="cases"
+            resultType="Map"
+            parameterType="hashmap">
+        SELECT p.pageName,c.* FROM webui.uicase c left join webui.page p on c.pageId=p.id where 1=1
+        <if test="id != null and id !='' ">
+            and c.id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="caseName != null and caseName != '' ">
+            and c.caseName LIKE CONCAT('%',#{caseName},'%' )
+        </if>
+        <if test="pageId != null and pageId != '' ">
+            and c.pageId=#{pageId,jdbcType=INTEGER}
+        </if>
+        <if test="pageType != null and pageType != '' ">
+            and c.pageType LIKE CONCAT('%',#{pageType},'%' )
+        </if>
+        <if test="phoneType != null and phoneType != '' ">
+            and c.phoneType LIKE CONCAT('%',#{phoneType},'%' )
+        </if>
+        <if test="browserType != null and browserType != '' ">
+            and c.browserType LIKE CONCAT('%',#{browserType},'%' )
+        </if>
+        <if test="status != null and status != ''">
+            and c.status=#{status,jdbcType=INTEGER}
+        </if>
+        <if test="canUse != null and canUse != ''">
+            and c.canUse=#{canUse,jdbcType=INTEGER}
+        </if>
+        <if test="addStartTime != null  and addStartTime != '' ">
+            and c.addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null  and addEndTime != '' ">
+            and c.addTime &lt;=#{addEndTime}
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and c.updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upEndTime != null and upEndTime != '' ">
+            and c.updateTime &lt;=#{upEndTime}
+        </if>
+        order by updateTime desc limit
+        #{limit1,jdbcType=INTEGER},#{limit2,jdbcType=INTEGER}
+    </select>
+    <select id="total" resultType="java.lang.Integer"
+            parameterType="hashmap">
+        SELECT count(*) FROM webui.uicase c left join webui.page p on c.pageId=p.id where 1=1
+        <if test="id != null and id !='' ">
+            and c.id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="caseName != null and caseName != '' ">
+            and c.caseName LIKE CONCAT('%',#{caseName},'%' )
+        </if>
+        <if test="pageId != null and pageId != '' ">
+            and c.pageId=#{pageId,jdbcType=INTEGER}
+        </if>
+        <if test="pageType != null and pageType != '' ">
+            and c.pageType LIKE CONCAT('%',#{pageType},'%' )
+        </if>
+        <if test="phoneType != null and phoneType != '' ">
+            and c.phoneType LIKE CONCAT('%',#{phoneType},'%' )
+        </if>
+        <if test="browserType != null and browserType != '' ">
+            and c.browserType LIKE CONCAT('%',#{browserType},'%' )
+        </if>
+        <if test="status != null and status != ''">
+            and c.status=#{status,jdbcType=INTEGER}
+        </if>
+        <if test="canUse != null and canUse != ''">
+            and c.canUse=#{canUse,jdbcType=INTEGER}
+        </if>
+        <if test="addStartTime != null  and addStartTime != '' ">
+            and c.addTime &gt;=#{addStartTime}
+        </if>
+        <if test="addEndTime != null  and addEndTime != '' ">
+            and c.addTime &lt;=#{addEndTime}
+        </if>
+        <if test="upStartTime != null and upStartTime != '' ">
+            and c.updateTime &gt;=#{upStartTime}
+        </if>
+        <if test="upEndTime != null and upEndTime != '' ">
+            and c.updateTime &lt;=#{upEndTime}
+        </if>
+    </select>
+    <update id="updateCase"
+            parameterType="com.thinkingdata.webui.entityUi.WebUiCase">
+        update uicase
+        <set>
+            <if test="caseName != null and caseName != '' ">
+                caseName = #{caseName},
+            </if>
+            <if test="url != null and url != '' ">
+                url = #{url},
+            </if>
+            <if test="pageId != null and pageId != '' ">
+                pageId = #{pageId},
+            </if>
+            <if test="pageType != null and pageType != '' ">
+                pageType = #{pageType},
+            </if>
+            <if test="browserType != null and browserType != '' ">
+                browserType = #{browserType},
+            </if>
+            stepIds = #{stepIds},phoneType = #{phoneType},status = #{status,jdbcType=INTEGER},canUse =
+            #{canUse,jdbcType=INTEGER},updateTime=now(),verifyAction=#{verifyAction},verifyValue=#{verifyValue}
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <!--根据id获取用例-->
+    <select id="getCaseById"
+            resultType="com.thinkingdata.webui.entityUi.WebUiCase">
+		select * from uicase where id=#{id}
+	</select>
+    <!--根据id删除用例-->
+    <delete id="deleteCaseById">
+        DELETE from uicase WHERE id=#{id}
+    </delete>
+    <!--根据业务id删除用例-->
+    <delete id="deleteCaseByPageId">
+        DELETE from uicase WHERE pageId=#{pageId}
+    </delete>
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.webui.daoUi.ExpectImageDao">
+    <insert id="addImage" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+		INSERT INTO
+		expectImage(stepId,completeImage,partImage,addTime,updateTime)
+		VALUES(#{stepId},#{completeImage},#{partImage},now(),now())
+	</insert>
+    <!--根据图片id获取图片-->
+    <select id="getImage"
+            resultType="com.thinkingdata.webui.entityUi.ExpectImage"
+            parameterType="java.lang.Integer">
+	select * from expectImage where stepId=#{stepId,jdbcType=INTEGER}
+	</select>
+
+    <update id="updateImage"
+            parameterType="com.thinkingdata.webui.entityUi.ExpectImage">
+        update expectImage set completeImage=#{completeImage},partImage=#{partImage} where stepId = #{stepId}
+    </update>
+
+    <!--根据步骤id删除图片-->
+    <delete id="deleteImage">
+        DELETE from expectImage WHERE stepId=#{stepId}
+    </delete>
+    <!--根据页面id删除图片-->
+    <delete id="deleteImageByPageId">
+delete from expectImage where stepId
+in(select id from  step where elementId in (select * from (select e.id from element e inner join page p on e.pageId=p.id where p.id=#{pageId}) elementIds));
+    </delete>
+
+</mapper>

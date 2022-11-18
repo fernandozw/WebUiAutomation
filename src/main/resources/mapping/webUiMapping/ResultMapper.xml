@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.webui.daoUi.WebUiResultDao">
+    <insert id="addResult" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+		INSERT INTO
+		caseresult(caseId,failStepId,failStepImage,failReason,status,useTime,addTime)
+		VALUES(#{caseId,jdbcType=INTEGER},#{failStepId,jdbcType=INTEGER},#{failStepImage},#{failReason},#{status,jdbcType=INTEGER},#{useTime},now())
+	</insert>
+    <select id="results" parameterType="map" resultType="Map">
+        SELECT
+        e.id elementId,e.elementName elementName,r.id id,r.caseId caseId,c.caseName caseName,p.id pageId,p.pageName pageName,r.failStepId failStepId,t.stepName stepName,r.failReason failReason,r.status status,r.usetime usetime,r.addTime addTime FROM
+        webui.caseresult r left join webui.uicase c on r.caseId=c.id  left join webui.page p on c.pageId=p.id left join webui.step t on r.failStepId =t.id left join webui.element e on e.id=t.elementId where
+        1=1
+        <if test="status != null and status !='' ">
+            and r.status=#{status,jdbcType=INTEGER}
+        </if>
+        <if test="id != null and id !='' ">
+            and r.id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="caseId != null and caseId !='' ">
+            and r.caseId=#{caseId,jdbcType=INTEGER}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and r.addTime &gt;=#{startTime}
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and r.addTime &lt;=#{endTime}
+        </if>
+        <if test="caseName != null and caseName != '' ">
+            and c.caseName LIKE CONCAT('%',#{caseName},'%' )
+        </if>
+        <if test="pageId != null and pageId != '' ">
+            and p.id=#{pageId,jdbcType=INTEGER}
+        </if>
+        order by r.addTime desc limit
+        #{limit1,jdbcType=INTEGER},#{limit2,jdbcType=INTEGER}
+    </select>
+    <select id="total" resultType="java.lang.Integer"
+            parameterType="map">
+        SELECT
+        count(*) FROM
+        webui.caseresult r left join webui.uicase c on r.caseId=c.id  left join webui.page p on c.pageId=p.id left join webui.step t on r.failStepId =t.id left join webui.element e on e.id=t.elementId where
+        1=1
+        <if test="status != null and status !='' ">
+            and r.status=#{status,jdbcType=INTEGER}
+        </if>
+        <if test="id != null and id !='' ">
+            and r.id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="caseId != null and caseId !='' ">
+            and r.caseId=#{caseId,jdbcType=INTEGER}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and r.addTime &gt;=#{startTime}
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and r.addTime &lt;=#{endTime}
+        </if>
+        <if test="caseName != null and caseName != '' ">
+            and c.caseName LIKE CONCAT('%',#{caseName},'%' )
+        </if>
+        <if test="pageId != null and pageId != '' ">
+            and p.id=#{pageId,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <resultMap id="chartMap" type="java.util.Map">
+        <result property="key" column="addTime"/>
+        <result property="value" column="count"/>
+    </resultMap>
+
+    <select id="totalGroupByDate" resultMap="chartMap"
+            parameterType="map">
+        SELECT date_format(r.addTime, '%Y-%m-%d') addTime,count(*) as count FROM
+        webui.caseresult r left join webui.uicase c on r.caseId=c.id left join webui.step t on r.failStepId =t.id left join webui.page p on p.id=c.pageId
+        where 1=1
+        <if test="status != null and status !='' ">
+            and r.status=#{status,jdbcType=INTEGER}
+        </if>
+        <if test="id != null and id !='' ">
+            and r.id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="caseId != null and caseId !='' ">
+            and r.caseId=#{caseId,jdbcType=INTEGER}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and r.addTime &gt;=#{startTime}
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and r.addTime &lt;=#{endTime}
+        </if>
+        <if test="caseName != null and caseName != '' ">
+            and c.caseName LIKE CONCAT('%',#{caseName},'%' )
+        </if>
+        <if test="pageId != null and pageId != '' ">
+            and p.id=#{pageId,jdbcType=INTEGER}
+        </if>
+        group by date_format(r.addTime, '%Y-%m-%d')
+        union
+        SELECT
+        DATE_FORMAT(ADDDATE(#{startTime}, INTERVAL @dateAdd:=@dateAdd+1 DAY),'%Y-%m-%d') addTime ,0 as count
+        FROM webui.inittime
+        LEFT JOIN (SELECT @dateAdd:=-1) t ON 1=1
+        WHERE  DATE_FORMAT(ADDDATE(#{startTime}, INTERVAL @dateAdd DAY),'%Y-%m-%d') <![CDATA[<]]> DATE_FORMAT(#{endTime},'%Y-%m-%d') order by addTime asc;
+    </select>
+
+    <select id="result"
+            resultType="com.thinkingdata.webui.entityUi.WebUiResult">
+		select * from caseresult where id=#{id,jdbcType=INTEGER} and
+		status=#{status,jdbcType=INTEGER}
+	</select>
+    <select id="caseList" resultType="com.thinkingdata.webui.entityUi.WebUiCase">
+        select * From uicase where id in
+        <foreach item="item" index="index" collection="ids"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="stepList" resultType="com.thinkingdata.webui.entityUi.WebUiStep">
+        select * From step where id in
+        <foreach item="item" index="index" collection="ids"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>
